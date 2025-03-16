@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Funcionários</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Cadastro de Funcionários</h1>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2>Alterar Funcionário</h2>
+            <form id="alterarForm">
+                <input type="hidden" id="alterarId">
+                <input type="text" id="alterarNome" placeholder="Nome">
+                <input type="email" id="alterarEmail" placeholder="Email">
+                <input type="text" id="alterarCargo" placeholder="Cargo">
+                <button type="submit">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+
+    <form id="funcionarioForm">
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="cargo" placeholder="Cargo" required>
+        <button type="submit">Adicionar Funcionário</button>
+    </form>
+
+    <input type="text" id="campoBusca" placeholder="Buscar por id">
+    <button id="botaoBuscar">Buscar</button>
+    <button id="botaoLimpar">Limpar</button>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Cargo</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody id="tabelaFuncionarios">
+        <!-- Funcionários serão adicionados aqui via JavaScript -->
+        </tbody>
+    </table>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
