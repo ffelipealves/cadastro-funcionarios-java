@@ -10,32 +10,58 @@
 
     <h1>Cadastro de Funcionários</h1>
 
-    <div id="modal" class="modal">
+    <!-- Modal para edição -->
+    <div id="modal" class="modal" role="dialog" aria-labelledby="modalTitle">
         <div class="modal-content">
-            <span id="closeModal" class="close">&times;</span>
-            <h2>Alterar Funcionário</h2>
+            <span id="closeModal" class="close" role="button" tabindex="0">&times;</span>
+            <h2 id="modalTitle">Alterar Funcionário</h2>
             <form id="alterarForm">
                 <input type="hidden" id="alterarId">
-                <input type="text" id="alterarNome" placeholder="Nome">
-                <input type="email" id="alterarEmail" placeholder="Email">
-                <input type="text" id="alterarCargo" placeholder="Cargo">
+
+                <label for="alterarNome">Nome:</label>
+                <input type="text" id="alterarNome" placeholder="Nome" required>
+
+                <label for="alterarEmail">Email:</label>
+                <input type="email" id="alterarEmail" placeholder="Email" required>
+
+                <label for="alterarCargo">Cargo:</label>
+                <input type="text" id="alterarCargo" placeholder="Cargo" required>
+
                 <button type="submit">Salvar Alterações</button>
             </form>
         </div>
     </div>
 
-
+    <!-- Formulário de cadastro -->
     <form id="funcionarioForm">
-        <input type="text" id="nome" placeholder="Nome" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="text" id="cargo" placeholder="Cargo" required>
-        <button type="submit">Adicionar Funcionário</button>
+        <fieldset>
+            <legend>Adicionar Funcionário</legend>
+
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" placeholder="Nome" required>
+            <br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Email" required>
+            <br>
+
+            <label for="cargo">Cargo:</label>
+            <input type="text" id="cargo" placeholder="Cargo" required>
+
+            <br>
+            <button type="submit">Adicionar Funcionário</button>
+        </fieldset>
     </form>
 
-    <input type="text" id="campoBusca" placeholder="Buscar por id">
-    <button id="botaoBuscar">Buscar</button>
-    <button id="botaoLimpar">Limpar</button>
+    <!-- Campo de busca -->
+    <div>
+        <label for="campoBusca">Buscar por ID:</label>
+        <input type="text" id="campoBusca" placeholder="Digite o ID">
+        <button id="botaoBuscar" type="button">Buscar</button>
+        <button id="botaoLimpar" type="button">Limpar</button>
+    </div>
 
+    <!-- Tabela de Funcionários -->
     <table>
         <thead>
         <tr>

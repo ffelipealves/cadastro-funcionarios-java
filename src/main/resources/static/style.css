@@ -1,4 +1,4 @@
-/* Reset básico para remover margens e definir uma fonte */
+/* Reset básico */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -12,24 +12,6 @@ h1 {
     color: #333;
 }
 
-/* Estilizando a tabela */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-th {
-    background-color: #007bff;
-    color: white;
-}
-
 /* Estilizando o formulário */
 form {
     display: flex;
@@ -38,15 +20,36 @@ form {
     margin: 20px auto;
     background: white;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-input {
+/* Fieldset e legend para melhor organização */
+fieldset {
+    border: none;
+    padding: 0;
+}
+
+legend {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff;
     margin-bottom: 10px;
-    padding: 8px;
+}
+
+/* Estilizando os labels */
+label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Estilizando os inputs */
+input {
+    margin-bottom: 15px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    font-size: 1em;
 }
 
 /* Estilizando os botões */
@@ -57,40 +60,103 @@ button {
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
+    font-size: 1em;
+    transition: background 0.3s;
 }
 
 button:hover {
     background-color: #218838;
 }
 
+/* Estilizando os botões de busca */
+#botaoBuscar, #botaoLimpar {
+    margin-top: 5px;
+}
+
+/* Container para busca */
+div {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilizando a tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Modal de edição */
 .modal {
-    display: none;
+    display: none; /* Certifica que o modal inicia oculto */
     position: fixed;
-    z-index: 1;
+    z-index: 10;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 
 .modal-content {
     background-color: white;
-    margin: 10% auto;
     padding: 20px;
     border-radius: 10px;
-    width: 300px;
+    width: 320px;
     text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Efeito de fade-in no modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Botão de fechar no modal */
 .close {
     color: red;
-    float: right;
-    font-size: 28px;
+    font-size: 24px;
+    font-weight: bold;
     cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top: 10px;
 }
 
-
-
-
-
+.close:hover {
+    color: darkred;
+}

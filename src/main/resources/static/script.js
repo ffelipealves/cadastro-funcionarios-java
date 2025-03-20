@@ -1,35 +1,59 @@
-// URL base da API
+// ✅ Mensagem para indicar que o script foi carregado
 console.log("Script carregado!");
+
+// ✅ URL base da API
 const apiUrl = "http://localhost:8080/api/funcionarios";
 
-// Função para buscar funcionários da API
+/**
+ * ✅ Função para buscar funcionários na API (por ID ou todos)
+ * @param {string} id (Opcional) - ID do funcionário a ser buscado
+ * @returns {Promise<Array>} Lista de funcionários
+ */
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("modal").style.display = "none";
+});
+
 async function buscarFuncionarios(id = "") {
     try {
         let url = apiUrl;
         if (id) {
-            url += `/${encodeURIComponent(id)}`;
+            url += `/${encodeURIComponent(id)}`; // Evita problemas com caracteres especiais no ID
         }
 
         const response = await fetch(url);
+
+        // Se a resposta não for OK (200-299), trata os erros
         if (!response.ok) {
+            if (response.status === 404) {
+                alert("Funcionário não encontrado.");
+                return [];
+            }
             throw new Error(`Erro HTTP! Status: ${response.status}`);
         }
 
         let funcionarios = await response.json();
-
-        // Garante que seja um array
-        return Array.isArray(funcionarios) ? funcionarios : [funcionarios];
+        return Array.isArray(funcionarios) ? funcionarios : [funcionarios]; // Garante um array
 
     } catch (error) {
         console.error("Erro ao buscar funcionários:", error);
-        return []; // Retorna um array vazio em caso de erro
+        alert("Erro ao buscar funcionários. Tente novamente mais tarde.");
+        return [];
     }
 }
 
-// Função para preencher a tabela com os funcionários
+/**
+ * ✅ Função para preencher a tabela com os funcionários
+ * @param {Array} funcionarios - Lista de funcionários
+ */
 function preencherTabela(funcionarios) {
     const tabela = document.getElementById("tabelaFuncionarios");
-    tabela.innerHTML = ""; // Limpa a tabela antes de recarregar
+    tabela.innerHTML = ""; // Limpa a tabela antes de preencher
+
+    if (funcionarios.length === 0) {
+        tabela.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum funcionário encontrado.</td></tr>`;
+        return;
+    }
 
     funcionarios.forEach(func => {
         const linha = document.createElement("tr");
@@ -46,10 +70,12 @@ function preencherTabela(funcionarios) {
         tabela.appendChild(linha);
     });
 
-    adicionarEventosBotoes();
+    adicionarEventosBotoes(); // Adiciona eventos após preencher a tabela
 }
 
-// Função para adicionar eventos aos botões da tabela
+/**
+ * ✅ Adiciona eventos aos botões da tabela
+ */
 function adicionarEventosBotoes() {
     document.querySelectorAll(".btn-deletar").forEach(botao => {
         botao.addEventListener("click", function () {
@@ -71,88 +97,138 @@ function adicionarEventosBotoes() {
             document.getElementById("alterarEmail").value = email;
             document.getElementById("alterarCargo").value = cargo;
 
-            // Abre o modal
-            document.getElementById("modal").style.display = "block";
+            // Abre o modal de edição
+            const modal = document.getElementById("modal");
+            if (modal) {
+                modal.style.display = "flex"; // Usa flexbox se necessário
+            }
         });
     });
 }
 
-// Função principal que orquestra tudo
+/**
+ * ✅ Função para carregar funcionários e atualizar a tabela
+ * @param {string} id (Opcional) - ID do funcionário a ser buscado
+ */
 async function carregarFuncionarios(id = "") {
     const funcionarios = await buscarFuncionarios(id);
     preencherTabela(funcionarios);
 }
 
-
-// Evento para cadastrar funcionário
-document.getElementById("funcionarioForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const novoFuncionario = {
-        nome: document.getElementById("nome").value,
-        email: document.getElementById("email").value,
-        cargo: document.getElementById("cargo").value
-    };
-
-    fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novoFuncionario)
-    })
-    .then(response => response.json())
-    .then(() => {
-        carregarFuncionarios(); // Atualiza a lista após cadastrar
-        document.getElementById("funcionarioForm").reset();
-    })
-    .catch(error => console.error("Erro ao cadastrar funcionário:", error));
-});
-
-document.getElementById("alterarForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const id = document.getElementById("alterarId").value; // Pegando o ID do funcionário
-    const alteradoFuncionario = {
-        nome: document.getElementById("alterarNome").value,
-        email: document.getElementById("alterarEmail").value,
-        cargo: document.getElementById("alterarCargo").value
-    };
-
-    fetch(`${apiUrl}/${id}`, { // Agora enviamos a requisição para apiUrl/{id}
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(alteradoFuncionario)
-    })
-    .then(response => response.json())
-    .then(() => {
-        carregarFuncionarios(); // Atualiza a lista após a alteração
-        document.getElementById("alterarForm").reset();
-        document.getElementById("modal").style.display = "none"; // Fecha o modal
-    })
-    .catch(error => console.error("Erro ao atualizar funcionário:", error));
-});
-
-
-// Deletar funcionario
-function deletarFuncionario(id) {
-    fetch(`${apiUrl}/${id}`, {
-        method: "DELETE"
-    })
-    .then(response => {
-        if (response.ok) {
-            carregarFuncionarios(); // Atualiza a tabela após deletar
-        } else {
-            console.error("Erro ao deletar funcionário");
-        }
-    })
-    .catch(error => console.error("Erro ao deletar funcionário:", error));
+/**
+ * ✅ Valida os dados do formulário antes de enviar para a API
+ */
+function validarFormulario(nome, email, cargo) {
+    if (!nome || !email || !cargo) {
+        alert("Todos os campos são obrigatórios.");
+        return false;
+    }
+    if (!email.includes("@")) {
+        alert("E-mail inválido.");
+        return false;
+    }
+    return true;
 }
 
+/**
+ * ✅ Evento para cadastrar funcionário
+ */
+document.getElementById("funcionarioForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
 
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const cargo = document.getElementById("cargo").value.trim();
+
+    if (!validarFormulario(nome, email, cargo)) {
+        return;
+    }
+
+    const novoFuncionario = { nome, email, cargo };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(novoFuncionario)
+        });
+
+        if (!response.ok) {
+            throw new Error("Erro ao cadastrar funcionário.");
+        }
+
+        alert("Funcionário cadastrado com sucesso!");
+        carregarFuncionarios();
+        document.getElementById("funcionarioForm").reset();
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao cadastrar funcionário.");
+    }
+});
+
+/**
+ * ✅ Evento para atualizar funcionário
+ */
+document.getElementById("alterarForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const id = document.getElementById("alterarId").value;
+    const nome = document.getElementById("alterarNome").value.trim();
+    const email = document.getElementById("alterarEmail").value.trim();
+    const cargo = document.getElementById("alterarCargo").value.trim();
+
+    if (!validarFormulario(nome, email, cargo)) {
+        return;
+    }
+
+    const alteradoFuncionario = { nome, email, cargo };
+
+    try {
+        const response = await fetch(`${apiUrl}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(alteradoFuncionario)
+        });
+
+        if (!response.ok) {
+            throw new Error("Erro ao atualizar funcionário.");
+        }
+
+        alert("Funcionário atualizado com sucesso!");
+        carregarFuncionarios();
+        document.getElementById("alterarForm").reset();
+        document.getElementById("modal").style.display = "none";
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao atualizar funcionário.");
+    }
+});
+
+/**
+ * ✅ Deletar funcionário com async/await
+ */
+async function deletarFuncionario(id) {
+    try {
+        const response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+
+        if (!response.ok) {
+            throw new Error(`Erro ao deletar funcionário. Status: ${response.status}`);
+        }
+
+        await carregarFuncionarios(); // Atualiza a tabela após deletar
+    } catch (error) {
+        console.error("Erro ao deletar funcionário:", error);
+    }
+}
+
+// ✅ Fechar modal ao clicar no botão "Fechar"
 document.getElementById("closeModal").addEventListener("click", function () {
     document.getElementById("modal").style.display = "none";
 });
 
-// Fechar o modal ao clicar fora dele
+// ✅ Fechar modal ao clicar fora dele
 window.addEventListener("click", function (event) {
     const modal = document.getElementById("modal");
     if (event.target === modal) {
@@ -160,22 +236,17 @@ window.addEventListener("click", function (event) {
     }
 });
 
+// ✅ Buscar funcionário pelo ID
 document.getElementById("botaoBuscar").addEventListener("click", function () {
     id = document.getElementById("campoBusca").value;
-    carregarFuncionarios(id) // Limpa o campo
+    carregarFuncionarios(id);
 });
 
-
-// ✅ Corrigindo o botão "Limpar"
+// ✅ Limpar campo de busca e carregar todos os funcionários
 document.getElementById("botaoLimpar").addEventListener("click", function () {
-    console.log("Botão Limpar clicado!");
-    document.getElementById("campoBusca").value = ""; // Limpa o campo
+    document.getElementById("campoBusca").value = "";
     carregarFuncionarios();
 });
 
-
-// Carregar funcionários ao abrir a página
+// ✅ Carregar funcionários ao abrir a página
 carregarFuncionarios();
-
-
-
