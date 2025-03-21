@@ -21,16 +21,30 @@ public class FuncionarioController {
     @GetMapping
     public ResponseEntity<List<Funcionario>> listarTodos() {
         List<Funcionario> funcionarios = funcionarioService.listarTodos();
-        return new ResponseEntity<>(funcionarios, HttpStatus.OK);
+        
+        if (funcionarios.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Retorna 204 No Content
+        }
+    
+        return ResponseEntity.ok(funcionarios);
     }
 
     // Endpoint para buscar um funcionário pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<Funcionario> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+        if (id <= 0) {
+            return ResponseEntity.badRequest().body("O ID deve ser um número positivo.");
+        }
+    
         Optional<Funcionario> funcionario = funcionarioService.buscarPorId(id);
-        return funcionario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        
+        if (funcionario.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário com ID " + id + " não encontrado.");
+        }
+    
+        return ResponseEntity.ok(funcionario.get());
     }
-
+    
     // Endpoint para salvar um novo funcionário
     @PostMapping
     public ResponseEntity<Funcionario> salvar(@RequestBody Funcionario funcionario) {
@@ -40,15 +54,44 @@ public class FuncionarioController {
 
     // Endpoint para atualizar um funcionário existente
     @PutMapping("/{id}")
-    public ResponseEntity<Funcionario> atualizar(@PathVariable Long id, @RequestBody Funcionario funcionarioAtualizado) {
-        Funcionario funcionario = funcionarioService.atualizar(id, funcionarioAtualizado);
-        return funcionario != null ? new ResponseEntity<>(funcionario, HttpStatus.OK) :
-                ResponseEntity.notFound().build();
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Funcionario funcionarioAtualizado) {
+        if (id <= 0) {
+            return ResponseEntity.badRequest().body("O ID deve ser um número positivo.");
+        }
+    
+        if (funcionarioAtualizado.getNome() == null || funcionarioAtualizado.getNome().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("O nome do funcionário é obrigatório.");
+        }
+    
+        if (funcionarioAtualizado.getEmail() == null || funcionarioAtualizado.getEmail().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("O e-mail do funcionário é obrigatório.");
+        }
+    
+        if (funcionarioAtualizado.getCargo() == null || funcionarioAtualizado.getCargo().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("O cargo do funcionário é obrigatório.");
+        }
+    
+        Optional<Funcionario> funcionarioExistente = funcionarioService.buscarPorId(id);
+        if (funcionarioExistente.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário com ID " + id + " não encontrado.");
+        }
+    
+        Funcionario funcionarioAtualizadoSalvo = funcionarioService.atualizar(id, funcionarioAtualizado);
+        return ResponseEntity.ok(funcionarioAtualizadoSalvo);
     }
 
     // Endpoint para excluir um funcionário
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+    public ResponseEntity<?> excluir(@PathVariable Long id) {
+        if (id <= 0) {
+            return ResponseEntity.badRequest().body("O ID deve ser um número positivo.");
+        }
+    
+        Optional<Funcionario> funcionarioExistente = funcionarioService.buscarPorId(id);
+        if (funcionarioExistente.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário com ID " + id + " não encontrado.");
+        }
+    
         funcionarioService.excluir(id);
         return ResponseEntity.noContent().build();
     }

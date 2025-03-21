@@ -18,22 +18,36 @@ async function buscarFuncionarios(id = "") {
     try {
         let url = apiUrl;
         if (id) {
-            url += `/${encodeURIComponent(id)}`; // Evita problemas com caracteres especiais no ID
+            url += `/${encodeURIComponent(id)}`;
         }
 
         const response = await fetch(url);
 
-        // Se a resposta não for OK (200-299), trata os erros
         if (!response.ok) {
+            let mensagemErro = `Erro HTTP! Status: ${response.status}`;
+            
+            if (response.status === 400) {
+                const textoErro = await response.text();
+                mensagemErro = `Erro 400: ${textoErro}`;
+                alert(mensagemErro);
+                return [];
+            }
+
             if (response.status === 404) {
                 alert("Funcionário não encontrado.");
                 return [];
             }
-            throw new Error(`Erro HTTP! Status: ${response.status}`);
+
+            throw new Error(mensagemErro);
         }
 
-        let funcionarios = await response.json();
-        return Array.isArray(funcionarios) ? funcionarios : [funcionarios]; // Garante um array
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            let funcionarios = await response.json();
+            return Array.isArray(funcionarios) ? funcionarios : [funcionarios];
+        } else {
+            throw new Error("Resposta inválida do servidor.");
+        }
 
     } catch (error) {
         console.error("Erro ao buscar funcionários:", error);
@@ -154,7 +168,14 @@ document.getElementById("funcionarioForm").addEventListener("submit", async func
         });
 
         if (!response.ok) {
-            throw new Error("Erro ao cadastrar funcionário.");
+            let mensagemErro = "Erro ao cadastrar funcionário.";
+
+            if (response.status === 400) {
+                const textoErro = await response.text();
+                mensagemErro = `Erro 400: ${textoErro}`;
+            }
+
+            throw new Error(mensagemErro);
         }
 
         alert("Funcionário cadastrado com sucesso!");
@@ -163,7 +184,7 @@ document.getElementById("funcionarioForm").addEventListener("submit", async func
 
     } catch (error) {
         console.error(error);
-        alert("Erro ao cadastrar funcionário.");
+        alert(error.message);
     }
 });
 
@@ -192,7 +213,14 @@ document.getElementById("alterarForm").addEventListener("submit", async function
         });
 
         if (!response.ok) {
-            throw new Error("Erro ao atualizar funcionário.");
+            let mensagemErro = "Erro ao atualizar funcionário.";
+
+            if (response.status === 400) {
+                const textoErro = await response.text();
+                mensagemErro = `Erro 400: ${textoErro}`;
+            }
+
+            throw new Error(mensagemErro);
         }
 
         alert("Funcionário atualizado com sucesso!");
@@ -202,9 +230,10 @@ document.getElementById("alterarForm").addEventListener("submit", async function
 
     } catch (error) {
         console.error(error);
-        alert("Erro ao atualizar funcionário.");
+        alert(error.message);
     }
 });
+
 
 /**
  * ✅ Deletar funcionário com async/await
